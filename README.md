@@ -1,4 +1,4 @@
-# TruthLens AI — Fake News Detector
+# TruthLens — Fake News Detector
 
 Matches your sketch: user submits a claim → server pulls comparison
 articles (NewsAPI, falling back to a local sample DB) → SBERT embeds
