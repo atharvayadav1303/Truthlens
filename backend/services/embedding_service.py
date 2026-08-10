@@ -1,41 +1,38 @@
+"""Lightweight claim-to-article similarity ranking.
+
+This deliberately avoids loading a transformer model at request time so the
+API can run reliably on small deployment instances.
 """
-Wraps a Sentence-BERT model so the rest of the app never has to think
-about tokenization, batching, or cosine math.
-"""
-from functools import lru_cache
-from sentence_transformers import SentenceTransformer, util
+from collections import Counter
+from math import sqrt
+import re
 
 
-@lru_cache(maxsize=1)
-def get_model() -> SentenceTransformer:
-    # all-MiniLM-L6-v2 is small (~80MB), fast on CPU, and good enough for
-    # headline/claim similarity. Swap for all-mpnet-base-v2 if you want
-    # higher accuracy at the cost of speed.
-    return SentenceTransformer("all-MiniLM-L6-v2")
+def _term_counts(text: str) -> Counter[str]:
+    return Counter(re.findall(r"[a-z0-9]+", text.lower()))
 
 
-def embed(texts: list[str]):
-    model = get_model()
-    return model.encode(texts, convert_to_tensor=True, normalize_embeddings=True)
+def _cosine_similarity(left: Counter[str], right: Counter[str]) -> float:
+    if not left or not right:
+        return 0.0
+
+    dot_product = sum(count * right.get(term, 0) for term, count in left.items())
+    left_norm = sqrt(sum(count * count for count in left.values()))
+    right_norm = sqrt(sum(count * count for count in right.values()))
+    return dot_product / (left_norm * right_norm) if left_norm and right_norm else 0.0
 
 
 def best_matches(claim: str, candidates: list[dict], top_k: int = 5) -> list[dict]:
-    """
-    candidates: list of dicts each with a "text" key (e.g. article title/summary).
-    Returns the same dicts, sorted by similarity, each annotated with a
-    "similarity" float in [0, 1].
-    """
+    """Rank candidate articles by normalized keyword overlap with the claim."""
     if not candidates:
         return []
 
-    claim_emb = embed([claim])
-    candidate_texts = [c["text"] for c in candidates]
-    candidate_embs = embed(candidate_texts)
+    claim_terms = _term_counts(claim)
+    ranked = []
+    for candidate in candidates:
+        article = dict(candidate)
+        article["similarity"] = round(_cosine_similarity(claim_terms, _term_counts(article["text"])), 4)
+        ranked.append(article)
 
-    scores = util.cos_sim(claim_emb, candidate_embs)[0]
-
-    for c, s in zip(candidates, scores):
-        c["similarity"] = round(float(s), 4)
-
-    candidates.sort(key=lambda c: c["similarity"], reverse=True)
-    return candidates[:top_k]
+    ranked.sort(key=lambda article: article["similarity"], reverse=True)
+    return ranked[:top_k]
