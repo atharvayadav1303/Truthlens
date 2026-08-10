@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>truth | TruthLens AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a class="wordmark" href="#">truth</a>
+    <nav class="nav-links">
+      <a href="#" class="active">Home</a>
+      <a href="#about">About</a>
+      <a href="#services">Services</a>
+      <a href="#" >Blog</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <a href="#verify" class="btn btn-outline">Explore Now</a>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <p class="eyebrow">Empowering Truth</p>
+    <h1>Unveil the Reality of News</h1>
+    <p class="hero-sub">
+      TruthLens harnesses SBERT-based semantic matching to analyze news credibility,
+      comparing your claim against real coverage to combat misinformation.
+    </p>
+
+    <div id="verify" class="verify-card">
+      <span class="pill-tag">🔍 VERIFICATION ENGINE</span>
+      <h2>Check Any News Article, Link, or Image</h2>
+      <p class="verify-sub">Type a news headline, paste an article URL, or upload a screenshot to verify credibility instantly.</p>
+
+      <div class="tabs">
+        <button class="tab active" data-tab="text">Text Input</button>
+        <button class="tab" data-tab="url">News Link</button>
+        <button class="tab" data-tab="image">Screenshot OCR</button>
+      </div>
+
+      <textarea id="claim-input" placeholder="Paste article text or message forward here..."></textarea>
+      <input id="url-input" class="hidden-input" type="url" placeholder="Paste article link (URL)...">
+      <input id="image-input" class="hidden-input" type="file" accept="image/*">
+
+      <div class="char-count"><span id="char-count">0</span> characters</div>
+
+      <div class="presets">
+        <span class="presets-label">⚡ Quick Presets:</span>
+        <button class="preset" data-preset="Indian chess player Gukesh became world champion.">📰 Health Myth</button>
+        <button class="preset" data-preset="You won a lottery of ₹25 lakh, share your bank details to claim.">💰 Financial Scam</button>
+        <button class="preset" data-preset="Gukesh Dommaraju won World chess championship">✅ Verified News</button>
+        <button class="preset" data-preset="Aliens spotted landing near Mumbai coastline last night.">📊 Unverified Claim</button>
+        <button id="analyze-btn" class="btn btn-primary">Analyze Credibility</button>
+      </div>
+
+      <div id="result" class="result hidden"></div>
+    </div>
+  </section>
+
+  <section id="services" class="solutions">
+    <h2>Our Innovative Solutions for News Analysis</h2>
+    <div class="solutions-grid">
+      <div class="solution-card">
+        <h3>Credibility Assessment</h3>
+        <p>SBERT-driven evaluation of news credibility against verified sources.</p>
+      </div>
+      <div class="solution-card">
+        <h3>Risk Level Analysis</h3>
+        <p>Threshold-based assessment of potential misinformation risk.</p>
+      </div>
+      <div class="solution-card">
+        <h3>Concise Summaries</h3>
+        <p>See exactly which outlets and passages matched your claim.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <p>TruthLens AI &mdash; built to combat misinformation.</p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

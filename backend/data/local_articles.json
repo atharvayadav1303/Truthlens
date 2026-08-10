@@ -1,0 +1,27 @@
+[
+  {
+    "text": "Indian chess player Gukesh became world champion. Gukesh Dommaraju defeated the reigning champion to become the youngest undisputed world chess champion.",
+    "source": "News Outlet",
+    "url": "https://example.com/gukesh-world-champion"
+  },
+  {
+    "text": "Indian boy dominated chess tournament. Teen grandmaster Gukesh Dommaraju swept through the championship match.",
+    "source": "Sports Desk",
+    "url": "https://example.com/gukesh-tournament"
+  },
+  {
+    "text": "RBI keeps repo rate unchanged at 6.5% for third straight meeting citing inflation concerns.",
+    "source": "Economic Times",
+    "url": "https://example.com/rbi-repo-rate"
+  },
+  {
+    "text": "ISRO successfully launches Chandrayaan follow-up mission to study lunar south pole.",
+    "source": "The Hindu",
+    "url": "https://example.com/isro-launch"
+  },
+  {
+    "text": "Monsoon session of Parliament to begin next week with focus on new data protection bill.",
+    "source": "Indian Express",
+    "url": "https://example.com/parliament-monsoon-session"
+  }
+]

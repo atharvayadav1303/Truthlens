@@ -1,0 +1,21 @@
+# Secrets
+.env
+**/.env
+!.env.example
+
+# Python environments and generated files
+.venv/
+.venv-win/
+venv/
+**/__pycache__/
+*.py[cod]
+
+# Node and Vite output
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+
+# Local tooling
+.DS_Store
+Thumbs.db
