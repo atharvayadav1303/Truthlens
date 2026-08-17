@@ -6,6 +6,10 @@ load_dotenv()
 NEWS_API_KEY = os.getenv("NEWS_API_KEY", "")
 NEWS_API_URL = "https://newsapi.org/v2/everything"
 
+# A compact SBERT model with strong semantic-search quality. It downloads once
+# on the first analysis request and is then cached by sentence-transformers.
+SBERT_MODEL = os.getenv("SBERT_MODEL", "all-MiniLM-L6-v2")
+
 TRUSTED_DOMAINS = [
     d.strip() for d in os.getenv("TRUSTED_DOMAINS", "").split(",") if d.strip()
 ]

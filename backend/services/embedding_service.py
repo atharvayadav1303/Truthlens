@@ -1,38 +1,47 @@
-"""Lightweight claim-to-article similarity ranking.
+"""Semantic claim-to-news matching powered by SBERT.
 
-This deliberately avoids loading a transformer model at request time so the
-API can run reliably on small deployment instances.
+Sentence-BERT embeds complete sentences into a shared vector space, so a
+claim can match an article that expresses the same idea with different words.
+The model is loaded on the first analysis request rather than when FastAPI
+starts, keeping imports and health checks fast.
 """
-from collections import Counter
-from math import sqrt
-import re
+from functools import lru_cache
+
+from sentence_transformers import SentenceTransformer
+
+from config import SBERT_MODEL
 
 
-def _term_counts(text: str) -> Counter[str]:
-    return Counter(re.findall(r"[a-z0-9]+", text.lower()))
-
-
-def _cosine_similarity(left: Counter[str], right: Counter[str]) -> float:
-    if not left or not right:
-        return 0.0
-
-    dot_product = sum(count * right.get(term, 0) for term, count in left.items())
-    left_norm = sqrt(sum(count * count for count in left.values()))
-    right_norm = sqrt(sum(count * count for count in right.values()))
-    return dot_product / (left_norm * right_norm) if left_norm and right_norm else 0.0
+@lru_cache(maxsize=1)
+def _get_model() -> SentenceTransformer:
+    """Load and cache the configured SBERT model for this worker process."""
+    return SentenceTransformer(SBERT_MODEL)
 
 
 def best_matches(claim: str, candidates: list[dict], top_k: int = 5) -> list[dict]:
-    """Rank candidate articles by normalized keyword overlap with the claim."""
-    if not candidates:
+    """Rank articles by cosine similarity to the claim's *meaning*.
+
+    With normalized embeddings, a dot product is cosine similarity. Encoding
+    the claim and all article text in one batch is also substantially faster
+    than encoding each article separately.
+    """
+    if not candidates or not claim.strip():
         return []
 
-    claim_terms = _term_counts(claim)
-    ranked = []
-    for candidate in candidates:
-        article = dict(candidate)
-        article["similarity"] = round(_cosine_similarity(claim_terms, _term_counts(article["text"])), 4)
-        ranked.append(article)
+    articles = [dict(candidate) for candidate in candidates]
+    texts = [article.get("text", "") for article in articles]
+    model = _get_model()
+    embeddings = model.encode(
+        [claim, *texts],
+        convert_to_numpy=True,
+        normalize_embeddings=True,
+        show_progress_bar=False,
+    )
 
-    ranked.sort(key=lambda article: article["similarity"], reverse=True)
-    return ranked[:top_k]
+    claim_embedding = embeddings[0]
+    for article, article_embedding in zip(articles, embeddings[1:]):
+        # Both vectors are unit-normalized, therefore this is cosine similarity.
+        article["similarity"] = round(float(claim_embedding @ article_embedding), 4)
+
+    articles.sort(key=lambda article: article["similarity"], reverse=True)
+    return articles[:top_k]
