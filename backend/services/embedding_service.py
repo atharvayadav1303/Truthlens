@@ -6,15 +6,21 @@ The model is loaded on the first analysis request rather than when FastAPI
 starts, keeping imports and health checks fast.
 """
 from functools import lru_cache
-
-from sentence_transformers import SentenceTransformer
+from typing import TYPE_CHECKING
 
 from config import SBERT_MODEL
 
+if TYPE_CHECKING:
+    from sentence_transformers import SentenceTransformer
+
 
 @lru_cache(maxsize=1)
-def _get_model() -> SentenceTransformer:
+def _get_model() -> "SentenceTransformer":
     """Load and cache the configured SBERT model for this worker process."""
+    # Importing PyTorch and sentence-transformers is expensive. Keeping it here
+    # lets Render's health endpoint respond before the first analysis request.
+    from sentence_transformers import SentenceTransformer
+
     return SentenceTransformer(SBERT_MODEL)
 
 
